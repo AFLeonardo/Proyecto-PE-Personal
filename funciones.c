@@ -175,12 +175,12 @@ void menu_articulos(FILE *articulosf)
 
                     do
                     {
-                        printf("Quieres agregar otro insumo al articulo(s/n): \n");
+                        printf("Quieres agregar otro insumo al articulo(s/n): ");
                         fflush(stdin);
                         scanf("%c", &agregar_insumo);
 
                         if (agregar_insumo != 'S' && agregar_insumo != 's' && agregar_insumo != 'N' && agregar_insumo != 'n')
-                            printf("Valor no valido, solo se permite (s/n) \n");
+                            printf("\nValor no valido, solo se permite (s/n)\n");
                     } while(agregar_insumo != 'S' && agregar_insumo != 's' && agregar_insumo != 'N' && agregar_insumo != 'n');
 
                     if (agregar_insumo == 's')
@@ -192,16 +192,9 @@ void menu_articulos(FILE *articulosf)
 
 
                 x_articulo.costo_produccion = costo_produccion;
+                
                 printf("El costo de produccion fue de %.2f \n", x_articulo.costo_produccion);
-                printf("\nClave articulo: %d", x_articulo.clave_articulo);
-                printf("\nDescripcion: %s", x_articulo.descripcion);
-                printf("\nTemp. siembra: %s", x_articulo.temp_siembra);
-                printf("\nTemp. cosecha: %s", x_articulo.temp_cosecha);
-                printf("\nInventario: %d", x_articulo.inventario);
-                printf("\nPrecio venta: %.2f", x_articulo.precio_venta);
-                printf("\nClave insumo: %d\n", x_articulo.insumos_requeridos[n_mercados]);
-
-
+                
                 while (n_mercados < 10 && (agregar_mercado == 's' || agregar_mercado == 'S'))
                 {
                     clave_valida = false;
@@ -217,13 +210,13 @@ void menu_articulos(FILE *articulosf)
                             clave_valida = true;
 
                         if(!clave_valida)
-                            printf("Clave del mercado no encontrada.\nIntenta con otra.\n");
+                            printf("Clave del mercado no encontrada.\nIntenta con otra.\n\n");
 
                     } while (!clave_valida);
 
                     do
                     {
-                        printf("Quieres agregar otro mercado al articulo?(s/n): \n");
+                        printf("Quieres agregar otro mercado al articulo?(s/n): ");
                         fflush(stdin);
                         scanf("%c", &agregar_mercado);
 
@@ -246,7 +239,7 @@ void menu_articulos(FILE *articulosf)
 
                 do
                 {
-                    printf("Agregar otro articulo (S/N): ");
+                    printf("\nAgregar otro articulo (S/N): ");
                     fflush(stdin);
                     scanf("%c", &agregar);
                     if (agregar != 'S' && agregar != 's' && agregar != 'N' && agregar != 'n')
@@ -510,7 +503,7 @@ void menu_empleados(FILE *fempleados)
             printf("Ingrese la calle: ");
             fflush(stdin);
             gets(empleados.direccion.calle);
-            if (!(validarchar(empleados.direccion.calle)))
+            if (!validarchar(empleados.direccion.calle))
                 printf("Ingrese una calle valida.\n");
 
         }while (!(validarchar(empleados.direccion.calle)));
@@ -519,7 +512,7 @@ void menu_empleados(FILE *fempleados)
         {
             printf("Ingrese el numero: ");
             gets(empleados.direccion.numero);
-            if (!(validarnumerodireccion(empleados.direccion.numero)))
+            if (!validarnumerodireccion(empleados.direccion.numero))
                 printf("Ingrese un numero valido.\n");
 
         }while (!(validarnumerodireccion(empleados.direccion.numero)));
@@ -529,10 +522,10 @@ void menu_empleados(FILE *fempleados)
             printf("Ingrese la colonia: ");
             fflush(stdin);
             gets(empleados.direccion.colonia);
-            if (!(validarchar(empleados.direccion.colonia)))
+            if (!validarchar(empleados.direccion.colonia))
                 printf("Ingrese una colonia valida.\n");
 
-        }while (!(validarchar(empleados.direccion.colonia)));
+        }while (!validarchar(empleados.direccion.colonia));
 
         do
         {
@@ -540,7 +533,7 @@ void menu_empleados(FILE *fempleados)
             printf("Ingrese el municipio: ");
             fflush(stdin);
             gets(empleados.direccion.municipio);
-            if (!(validarchar(empleados.direccion.municipio)))
+            if (!validarchar(empleados.direccion.municipio))
                 printf("Ingrese un municipio valido.\n");
 
         }while (strlen(empleados.direccion.municipio) < 0);
@@ -550,10 +543,10 @@ void menu_empleados(FILE *fempleados)
             printf("Ingrese el estado: ");
             fflush(stdin);
             gets(empleados.direccion.estado);
-            if (!(validarchar(empleados.direccion.estado)))
+            if (!validarchar(empleados.direccion.estado))
                 printf("Ingrese un estado valido.\n");
 
-        }while (!(validarchar(empleados.direccion.estado)));
+        }while (!validarchar(empleados.direccion.estado));
 
 
 
