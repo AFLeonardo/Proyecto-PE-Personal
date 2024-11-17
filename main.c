@@ -3,9 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include "funciones.c"
+#include <locale.h>
 
 main()
 {
+    setlocale(LC_ALL, "");
     int opcion;
     bool ciclo = true;
     FILE *archivo;
@@ -98,13 +100,13 @@ main()
                 break;
 
             case 6:
-                printf("%s\n", "VENTAS\n");
                 if((archivo = fopen("Ventas.txt", "a")) == NULL)
                     printf("ERROR.\nSe esta creando el archivo intenta de nuevo.\n");
                 else
                 {
                     menu_control_ventas(archivo);
                     fclose(archivo);
+                    system("cls");
                 }
                 break;
 
@@ -119,7 +121,6 @@ main()
                 break;
 
             case 8:
-                printf("%s\n", "CONTROL DE INVENTARIO\n");
                 if((archivo = fopen("Compras.txt", "r")) == NULL)
                     printf("ERROR.\nNo se pudo abrir el archivo.\n");
                 else
