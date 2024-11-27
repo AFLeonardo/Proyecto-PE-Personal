@@ -3,11 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 #include "funciones.c"
-#include <locale.h>
 
 main() 
 {
-    setlocale(LC_ALL, "");
+    system("chcp 65001");
+    system("cls");
     int opcion;
     bool ciclo = true;
     FILE *archivo;
@@ -53,7 +53,7 @@ main()
                 {
                     menu_articulos(archivo);
                     fclose(archivo);
-                    system("cls");
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -67,7 +67,7 @@ main()
                 {
                     menu_insumos(archivo);
                     fclose(archivo);
-                    system("cls");
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -81,6 +81,7 @@ main()
                 {
                     menu_mercados(archivo);
                     fclose(archivo);
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -94,6 +95,7 @@ main()
                 {
                     menu_empleados(archivo);
                     fclose(archivo);
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -107,7 +109,7 @@ main()
                 {
                     menu_proveedores(archivo);
                     fclose(archivo);
-                    system("cls");
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -118,7 +120,7 @@ main()
                 {
                     menu_control_ventas(archivo);
                     fclose(archivo);
-                    system("cls");
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -129,6 +131,7 @@ main()
                 {
                     menu_control_compras(archivo);
                     fclose(archivo);
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
@@ -139,11 +142,13 @@ main()
                 {
                     menu_control_inventario(archivo);
                     fclose(archivo);
+                    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 }
                 break;
 
             case 9:
                 menu_reportes();
+                printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
                 break;
 
             case 10:
