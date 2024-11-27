@@ -930,8 +930,8 @@ void menu_control_ventas(FILE *fventas)
 
     tm_info = localtime(&t);
     dia_venta = tm_info->tm_mday;
-    mes_venta = tm_info->tm_mon + 1;       
-    anio_venta = tm_info->tm_year + 1900; 
+    mes_venta = tm_info->tm_mon + 1;
+    anio_venta = tm_info->tm_year + 1900;
 
     printf("$$\\    $$\\                       $$\\                          \n");
     printf("$$ |   $$ |                      $$ |                         \n");
@@ -941,12 +941,13 @@ void menu_control_ventas(FILE *fventas)
     printf("  \\$$$  /  $$   ____|$$ |  $$ |  $$ |$$\\ $$  __$$ | \\____$$\\ \n");
     printf("   \\$  /   \\$$$$$$$\\ $$ |  $$ |  \\$$$$  |\\$$$$$$$ |$$$$$$$  | \n");
     printf("    \\_/     \\_______|\\__|  \\__|   \\____/  \\_______|\\_______/ \n");
-    
 
     printf("\nINGRESA LA INFORMACION.\n\n");
+
     while (agregar_venta != 'n' && agregar_venta != 'N')
     {
         total = 0;
+
         do
         {
             printf("1) Ingrese la clave de mercado: ");
@@ -980,7 +981,7 @@ void menu_control_ventas(FILE *fventas)
 
             clave_valida = validarcantidad(Cantidad_articulo, clave_articulo);
 
-            if (clave_valida == 0 ||  clave_valida == 3)
+            if (clave_valida == 0 || clave_valida == 3)
             {
                 printf("No se puede proceder con la venta.\n");
                 system("pause");
@@ -988,9 +989,8 @@ void menu_control_ventas(FILE *fventas)
             }
         } while (clave_valida != 1 && agregar_venta != 'n');
 
-
         precioarticulo = precio(clave_articulo, &articulo_descripcion);
-        printf("4) Precio del articulo: %.2f\n", precioarticulo);
+        printf("4) Precio del articulo: $%.2f\n", precioarticulo);
         descuento_mercado = descuento(clave_mercado);
         total += precioarticulo * Cantidad_articulo * (1 - descuento_mercado);
 
@@ -998,7 +998,7 @@ void menu_control_ventas(FILE *fventas)
         {
             do
             {
-                printf("5) Ingrese el numero de empleado: ");
+                printf("5) Número de empleado: ");
                 scanf("%d", &num_empleado);
 
                 if (!validarempleado(num_empleado))
@@ -1012,12 +1012,14 @@ void menu_control_ventas(FILE *fventas)
                 fflush(stdin);
                 scanf("%c", &agregar_articulo);
 
-                if (agregar_articulo != 'S' && agregar_articulo != 's' && agregar_articulo != 'N' && agregar_articulo != 'n')
+                if (agregar_articulo != 'S' && agregar_articulo != 's' &&
+                    agregar_articulo != 'N' && agregar_articulo != 'n')
                     printf("Respuesta no valida. Solo se permite S o N.\n");
 
-            } while (agregar_articulo != 'S' && agregar_articulo != 's' && agregar_articulo != 'N' && agregar_articulo != 'n');
+            } while (agregar_articulo != 'S' && agregar_articulo != 's' &&
+                     agregar_articulo != 'N' && agregar_articulo != 'n');
 
-            printf("Total de la venta (con descuento aplicado): %.2f\n", total);
+            printf("Total de la venta (con descuento aplicado): $%.2f\n", total);
 
             do
             {
@@ -1028,10 +1030,13 @@ void menu_control_ventas(FILE *fventas)
                 if (factura != 'S' && factura != 's' && factura != 'N' && factura != 'n')
                     printf("Respuesta no valida. Solo se permite S o N.\n");
 
-            } while (factura != 'S' && factura != 's' && factura != 'N' && factura != 'n');
+            } while (factura != 'S' && factura != 's' &&
+                     factura != 'N' && factura != 'n');
 
             if (factura == 'S' || factura == 's')
-                imprimir_factura(clave_mercado, clave_articulo, articulo_descripcion, Cantidad_articulo, precioarticulo, num_empleado, total, dia_venta, mes_venta, anio_venta, descuento_mercado);
+                imprimir_factura(clave_mercado, clave_articulo, articulo_descripcion,
+                                 Cantidad_articulo, precioarticulo, num_empleado,
+                                 total, dia_venta, mes_venta, anio_venta, descuento_mercado);
 
             fprintf(fventas, "Clave mercado: %d\n", clave_mercado);
             fprintf(fventas, "Clave articulo: %d\n", clave_articulo);
@@ -1048,11 +1053,12 @@ void menu_control_ventas(FILE *fventas)
                 fflush(stdin);
                 scanf("%c", &agregar_venta);
 
-                if (agregar_venta != 'S' && agregar_venta != 's' && agregar_venta != 'N' && agregar_venta != 'n')
+                if (agregar_venta != 'S' && agregar_venta != 's' &&
+                    agregar_venta != 'N' && agregar_venta != 'n')
                     printf("Respuesta no valida. Solo se permite S o N.\n");
 
-            } while (agregar_venta != 'S' && agregar_venta != 's' && agregar_venta != 'N' && agregar_venta != 'n');
-
+            } while (agregar_venta != 'S' && agregar_venta != 's' &&
+                     agregar_venta != 'N' && agregar_venta != 'n');
         }
     }
 }
@@ -1094,8 +1100,6 @@ void menu_control_compras(FILE *fcompras)
 
     id_compra = ultimo_id_compra + 1;
 
-    printf("\n\nUltimo ID de compra: %d\n", id_compra);
-
     while(agregar_compra == 'S' || agregar_compra == 's')
     {
         total = 0;
@@ -1133,10 +1137,10 @@ void menu_control_compras(FILE *fcompras)
             } while (cantidad < 0);
 
             precio_insumo = precioinsumo(insumo);
-            printf("\n*** \nEl precio del insumo es: %.2f\n***\n\n", precio_insumo);
+            printf("\n* Precio unitario del insumo: $%.2f *\n", precio_insumo);
 
             descuento = descuento_proveedor(Num_proveedor);
-            printf("Descuento de: %.2f\n",descuento);
+            printf("Con un descuento del: %%%.2f\n", descuento * 100);
             total += precio_insumo * cantidad * (1 - descuento);
 
             fprintf(fcompras, "ID compra: %d\n", id_compra);
@@ -1158,7 +1162,7 @@ void menu_control_compras(FILE *fcompras)
             } while (agregar_insumo != 'S' && agregar_insumo != 's' && agregar_insumo != 'N' && agregar_insumo != 'n');
         }
 
-        printf("Total de la compra: %.2f\n", total);
+        printf("Total de la compra: $%.2f\n", total);
         fprintf(fcompras, "Total: %.2f\n\n", total);
 
         do
@@ -1650,7 +1654,6 @@ float generar_comision(int num_empleado, float total)
     {
         fseek(empleadof, (num_empleado - 1) * sizeof(struct Empleado), SEEK_SET);
         fread(&lectura_empleado, sizeof(struct Empleado), 1, empleadof);
-        printf("El porcentaje de comision del empleado es de %f\n", lectura_empleado.comision);
         comision = lectura_empleado.comision * total;
     }
     fclose(empleadof);
@@ -1704,7 +1707,6 @@ int validarcantidad(int cantidad_articulos, int fclave) {
     FILE *articulolocal;
     struct Articulos articulos;
 
-    // Abrir el archivo en modo lectura/escritura
     if ((articulolocal = fopen("Articulos.dat", "r+")) == NULL)
     {
         printf("Error al abrir el archivo de articulos.\n");
@@ -1813,22 +1815,22 @@ float descuento(int fclave)
 void imprimir_factura(int mercado, int articulo, char descripcion[150], int cantidad, float precio_unitario, int empleado, float total, int dia, int mes, int anio, float descuento) 
 {
     int descuento_porcentaje = (int)(descuento * 100); 
-    printf("\n=========================================\n");
-    printf("                 FACTURA                 \n");
-    printf("=========================================\n");
-    printf("Cliente (No. Mercado):       %d\n", mercado);
-    printf("Articulo (ID):               %d\n", articulo);
-    printf("Descripcion:                 %s\n", descripcion);
-    printf("Fecha de venta:              %02d/%02d/%04d\n", dia, mes, anio);
-    printf("Descuento del:               %d%%\n", descuento_porcentaje);
-    printf("-----------------------------------------\n");
-    printf("Cantidad:                    %d\n", cantidad);
-    printf("Precio unitario:             $%.2f\n", precio_unitario);
-    printf("-----------------------------------------\n");
-    printf("Empleado (ID):               %d\n", empleado);
-    printf("=========================================\n");
-    printf("TOTAL A PAGAR:               $%.2f\n", total);
-    printf("=========================================\n");
+    printf("\n\t\t=========================================\n");
+    printf("\t\t                 FACTURA                 \n");
+    printf("\t\t=========================================\n");
+    printf("\t\tCliente (No. Mercado):       %d\n", mercado);
+    printf("\t\tArticulo (ID):               %d\n", articulo);
+    printf("\t\tDescripcion:                 %s\n", descripcion);
+    printf("\t\tFecha de venta:              %02d/%02d/%04d\n", dia, mes, anio);
+    printf("\t\tDescuento del:               %d%%\n", descuento_porcentaje);
+    printf("\t\t-----------------------------------------\n");
+    printf("\t\tCantidad:                    %d\n", cantidad);
+    printf("\t\tPrecio unitario:             $%.2f\n", precio_unitario);
+    printf("\t\t-----------------------------------------\n");
+    printf("\t\tEmpleado (ID):               %d\n", empleado);
+    printf("\t\t=========================================\n");
+    printf("\t\tTOTAL A PAGAR:               $%.2f\n", total);
+    printf("\t\t=========================================\n");
 }
 
 char *convertir_a_minusculas(char *cadena)
