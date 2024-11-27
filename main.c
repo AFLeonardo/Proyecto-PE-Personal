@@ -136,7 +136,7 @@ main()
                 break;
 
             case 8:
-                if ((archivo = fopen("Compras.txt", "r")) == NULL) 
+                if ((archivo = fopen("Compras.txt", "r+")) == NULL) 
                     printf("ERROR.\nNo se pudo abrir el archivo.\n");
                 else 
                 {

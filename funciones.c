@@ -1148,7 +1148,7 @@ void menu_control_compras(FILE *fcompras)
             fprintf(fcompras, "Numero de insumo: %d\n", insumo);
             fprintf(fcompras, "Cantidad: %d\n", cantidad);
             fprintf(fcompras, "Precio: %.2f\n", precio_insumo);
-            fprintf(fcompras, "Entregado %c\n", entregado);
+            fprintf(fcompras, "Entregado: %c\n", entregado);
 
             do
             {
@@ -1185,7 +1185,7 @@ void menu_control_inventario(FILE * farchivo)
 {
     int num_proveedor, numero_compra, id_compras = 0, clave_insumo, cantidad, proveedor, auxiliar_id = 0;
     char recepcion = 's', respuesta[5], entregado;
-    struct Insumo insumos;
+    struct Insumo insumoLeido;
     FILE *archivo_insumo;
     float precio, total;
     bool checar = true;
@@ -1198,95 +1198,95 @@ void menu_control_inventario(FILE * farchivo)
     printf("  $$ |  $$ |  $$ |  \\$$$  /  $$   ____|$$ |  $$ |  $$ |$$\\ $$  __$$ |$$ |      $$ |$$ |  $$ | \n");
     printf("$$$$$$\\ $$ |  $$ |   \$  /   \\$$$$$$$\\ $$ |  $$ |  \\$$$$  |\\$$$$$$$ |$$ |      $$ |\\$$$$$$  | \n");
     printf("\\______|\\__|  \\__|    \\_/     \\_______|\\__|  \\__|   \\____/  \\_______|\\__|      \\__| \\______/  \n");
-    
+
     printf("\nINGRESA LA INFORMACION.\n\n");
     while (recepcion == 'S' || recepcion == 's')
     {
         if ((archivo_insumo = fopen("Insumos.dat", "r")) == NULL)
             printf("Error al abrir el archivo de insumos. \n");
-
         else
         {
             do
             {
-                printf("1. Numero de proveedor: ");
+                printf("1) Numero de proveedor: ");
                 scanf("%d", &num_proveedor);
 
                 if (!validarproveedor(num_proveedor))
-                        printf("Numero de proveedor invalido.\n");
+                    printf("Numero de proveedor invalido. Ingresa uno existente.\n");
 
             } while (!validarproveedor(num_proveedor));
 
-                while (!feof(farchivo))
+            printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
+            printf("| %-18s | %-18s | %-40s | %-18s |\n", "ID Compra", "Insumo", "Descripcion", "Cantidad");
+            
+            rewind(farchivo);
+            
+            while (fscanf(farchivo, "ID compra: %d\n", &id_compras) == 1)
+            {
+                fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedor);
+                fscanf(farchivo, "Numero de insumo: %d\n", &clave_insumo);
+                fscanf(farchivo, "Cantidad: %d\n", &cantidad);
+                fscanf(farchivo, "Precio: %f\n", &precio);
+                fscanf(farchivo, "Entregado: %c\n", &entregado);
+                
+                // Leer el total directamente desde el archivo
+                fscanf(farchivo, "Total: %f\n", &total);
+
+                // Leer el insumo correspondiente
+                fseek(archivo_insumo, (clave_insumo - 1) * sizeof(struct Insumo), SEEK_SET);
+                fread(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
+
+                // Verificar que se encontró el insumo y mostrar la información
+                if (clave_insumo == insumoLeido.clave_insumo)
                 {
                     printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
-                    printf("| %-18s | %-18s | %-40s | %-18s |\n", "ID Compra", "Insumo", "Descripcion", "Cantidad");
+                    printf("| %-18d | %-18d | %-40s | %-18d |\n", id_compras, clave_insumo, insumoLeido.descripcion, cantidad);
                     printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
-                    fscanf(farchivo, "ID compra: %d\n", &id_compras);
-                    fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedor);
-                    fscanf(farchivo, "Numero de insumo: %d\n", &clave_insumo);
-                    fscanf(farchivo, "Cantidad: %d\n", &cantidad);
-                    fscanf(farchivo, "Precio: %f\n", &precio);
-                    fscanf(farchivo, "Total: %f\n", &total);
-
-                    fseek(archivo_insumo, (clave_insumo - 1) * sizeof(struct Insumo), SEEK_SET);
-                    fread(&insumos, sizeof(struct Insumo),1 , archivo_insumo);
-
-                    if (clave_insumo == insumos.clave_insumo)
-                        printf("| %-18d | %-18d | %-40s | %-18d |\n", id_compras, clave_insumo, insumos.descripcion, cantidad);
-
-                    printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
-                    printf("Total: %.2f\n", total);
-
+                    printf("Total: $%.2f\n", total);
                 }
+            }
 
+            do
+            {
+                printf("2) ID de compra: ");
+                scanf("%d", &numero_compra);
 
-                do
-                {
-                    printf("2. Numero de compra: ");
-                    scanf("%d", &numero_compra);
+                if (!validar_compra(numero_compra))
+                    printf("Numero de compra invalido\n");
 
-                    if (!validar_compra(numero_compra))
-                        printf("Numero de compra invalido\n");
+            } while (!validar_compra(numero_compra));
 
-                }while(!validar_compra(numero_compra));
+            do
+            {
+                printf("Le fue recibida la compra?: ");
+                fflush(stdin);
+                gets(respuesta);
 
-                do
-                {
-                    printf("Le fue recibida la compra?: ");
-                    fflush(stdin);
-                    gets(respuesta);
+                if (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "Si") != 0)
+                    printf("Respuesta invalida\n");
 
-                    if (strcmp(respuesta, "si") != 0 || strcmp(respuesta, "Si") != 0)
-                        printf("Respuesta invalida\n");
+            } while (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "Si") != 0);
 
-                } while (strcmp(respuesta, "si") != 0 || strcmp(respuesta, "Si") != 0);
+            if (strcmp(respuesta, "si") == 0 || strcmp(respuesta, "Si") == 0) // CUIDADO AQUI
+            {
+                fseek(archivo_insumo, (numero_compra - 1) * sizeof(struct Insumo), SEEK_SET);
+                fread(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
 
-                if (strcmp(respuesta, "si") == 0 || strcmp(respuesta, "Si") == 0)
-                {
-                    fseek(archivo_insumo, (numero_compra - 1) * sizeof(struct Insumo), SEEK_SET);
-                    fread(&insumos, sizeof(struct Insumo), 1 , archivo_insumo);
+                insumoLeido.inventario += cantidad;
 
-                    insumos.inventario += cantidad;
+                fseek(archivo_insumo, (numero_compra - 1) * sizeof(struct Insumo), SEEK_SET);
+                fwrite(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
 
-                    fseek(archivo_insumo, (numero_compra - 1) * sizeof(struct Insumo), SEEK_SET);
-                    fwrite(&insumos, sizeof(struct Insumo), 1 , archivo_insumo);
+                entregado = 's';
 
-                    entregado = 's';
-
-                    fscanf(farchivo, "ID compra: %d\n", &id_compras);
-                    fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedor);
-                    fscanf(farchivo, "Numero de insumo: %d\n", &clave_insumo);
-                    fscanf(farchivo, "Cantidad: %d\n", &cantidad);
-                    fscanf(farchivo, "Precio: %f\n", &precio);
-                    fscanf(farchivo, "Total: %f\n", &total);
-                    fscanf(farchivo, "Entregado: %c\n", &entregado);
-
-                    fprintf(farchivo, "Entregado %c\n", entregado);
-
-
-                }
-                fclose(farchivo);
+                fprintf(farchivo, "ID compra: %d\n", id_compras);
+                fprintf(farchivo, "Numero de proveedor: %d\n", num_proveedor);
+                fprintf(farchivo, "Numero de insumo: %d\n", clave_insumo);
+                fprintf(farchivo, "Cantidad: %d\n", cantidad);
+                fprintf(farchivo, "Precio: %.2f\n", precio);  // Es mejor mostrar los precios con 2 decimales
+                fprintf(farchivo, "Entregado: %c\n", entregado);
+                fprintf(farchivo, "Total: %.2f\n", total);  // También para el total   
+            }
 
             do
             {
@@ -1297,12 +1297,12 @@ void menu_control_inventario(FILE * farchivo)
                 if (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n')
                     printf("Valor no valido. Solo se permite S o N.\n");
 
-            }while(recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n');
-
+            } while (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n');
         }
         fclose(archivo_insumo);
     }
 }
+
 
 void menu_reportes()
 {
@@ -1967,6 +1967,7 @@ bool validar_compra(int numero_compra)
         fscanf(archivo, "Numero de insumo: %d\n", &clave_insumo);
         fscanf(archivo, "Cantidad: %d\n", &cantidad);
         fscanf(archivo, "Precio: %f\n", &precio);
+        fscanf(archivo, "Entregado: %c\n", &precio);
         fscanf(archivo, "Total: %f\n", &total);
 
         if (numero_compra == id_compra)
