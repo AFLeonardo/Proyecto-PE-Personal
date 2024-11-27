@@ -1065,7 +1065,7 @@ void menu_control_ventas(FILE *fventas)
 
 void menu_control_compras(FILE *fcompras)
 {
-    int Num_proveedor, insumo, cantidad, id_compra = 0, ultimo_id_compra = -20, provedor;
+    int Num_proveedor, insumo, cantidad, id_compra = 0, ultimo_id_compra = 0, provedor;
     float precio_insumo, total = 0, descuento, precio;
     char agregar_insumo, agregar_compra = 's', entregado = 'n';
 
@@ -1082,24 +1082,16 @@ void menu_control_compras(FILE *fcompras)
     printf("                                  \\__|                                     \n");
     printf("\nINGRESA LA INFORMACION.\n\n");
 
-    fscanf(fcompras, "ID compra: %d\n", &id_compra);
-    while (!feof(fcompras))
+    while (fscanf(fcompras, "ID compra: %d\n", &id_compra) == 1)
     {
         if (id_compra > ultimo_id_compra)
             ultimo_id_compra = id_compra;
 
-
-        fscanf(fcompras, "%*[^\n]\n");
-        fscanf(fcompras, "%*[^\n]\n");
-        fscanf(fcompras, "%*[^\n]\n");
-        fscanf(fcompras, "%*[^\n]\n");
-        fscanf(fcompras, "%*[^\n]\n");
-        fscanf(fcompras, "ID compra: %d\n", &id_compra);
-
+        for (int i = 0; i < 6; i++)
+            fscanf(fcompras, "%*[^\n]\n");
     }
-
     id_compra = ultimo_id_compra + 1;
-
+    
     while(agregar_compra == 'S' || agregar_compra == 's')
     {
         total = 0;
@@ -1196,7 +1188,7 @@ void menu_control_inventario(FILE * farchivo)
     printf("  $$ |  $$  __$$\\ \\$$\\  $$  |$$  __$$\\ $$  __$$\\ \\_$$  _|   \\____$$\\ $$  __$$\\ $$ |$$  __$$\\ \n");
     printf("  $$ |  $$ |  $$ | \\$$\\$$  / $$$$$$$$ |$$ |  $$ |  $$ |     $$$$$$$ |$$ |  \\__|$$ |$$ /  $$ | \n");
     printf("  $$ |  $$ |  $$ |  \\$$$  /  $$   ____|$$ |  $$ |  $$ |$$\\ $$  __$$ |$$ |      $$ |$$ |  $$ | \n");
-    printf("$$$$$$\\ $$ |  $$ |   \$  /   \\$$$$$$$\\ $$ |  $$ |  \\$$$$  |\\$$$$$$$ |$$ |      $$ |\\$$$$$$  | \n");
+    printf("$$$$$$\\ $$ |  $$ |   \\$  /   \\$$$$$$$\\ $$ |  $$ |  \\$$$$  |\\$$$$$$$ |$$ |      $$ |\\$$$$$$  | \n");
     printf("\\______|\\__|  \\__|    \\_/     \\_______|\\__|  \\__|   \\____/  \\_______|\\__|      \\__| \\______/  \n");
 
     printf("\nINGRESA LA INFORMACION.\n\n");
