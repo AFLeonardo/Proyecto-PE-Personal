@@ -1854,20 +1854,20 @@ void crearRegistrosVacios(const char *nombreArchivo, void *registroVacio, size_t
 bool validarproveedor(int NumeroProveedor)
 {
     FILE *proveedorlocal;
-    struct Proveedor proveedores;
+    struct Proveedor proveedor;
     bool proovedorvalido = false;
 
     if ((proveedorlocal = fopen("Proveedores.dat", "r")) == NULL)
         printf("Error al abrir el archivo de proveedores.\n");
-
     else
     {
         fseek(proveedorlocal, (NumeroProveedor - 1) * sizeof(struct Proveedor), SEEK_SET);
-        fread(&proveedores, sizeof(struct Proveedor), 1, proveedorlocal);
+        fread(&proveedor, sizeof(struct Proveedor), 1, proveedorlocal);
 
-        if (proveedores.numero_proveedor == NumeroProveedor)
+        if (proveedor.numero_proveedor == NumeroProveedor)
             proovedorvalido = true;
     }
+    
     fclose(proveedorlocal);
     return proovedorvalido;
 }
