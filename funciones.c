@@ -1173,127 +1173,6 @@ void menu_control_compras(FILE *fcompras)
     }
 }
 
-void menu_control_inventario(FILE * farchivo)
-{
-    int num_proveedor, numero_compra, id_compras = 0, clave_insumo, cantidad, proveedor, auxiliar_id = 0;
-    char recepcion = 's', respuesta[5], entregado;
-    struct Insumo insumoLeido;
-    FILE *archivo_insumo;
-    float precio, total;
-    bool checar = true;
-
-    printf("$$$$$$\\                                            $$\\                         $$\\           \n");
-    printf("\\_$$  _|                                           $$ |                        \\__|          \n");
-    printf("  $$ |  $$$$$$$\\  $$\\    $$\\  $$$$$$\\  $$$$$$$\\  $$$$$$\\    $$$$$$\\   $$$$$$\\  $$\\  $$$$$$\\  \n");
-    printf("  $$ |  $$  __$$\\ \\$$\\  $$  |$$  __$$\\ $$  __$$\\ \\_$$  _|   \\____$$\\ $$  __$$\\ $$ |$$  __$$\\ \n");
-    printf("  $$ |  $$ |  $$ | \\$$\\$$  / $$$$$$$$ |$$ |  $$ |  $$ |     $$$$$$$ |$$ |  \\__|$$ |$$ /  $$ | \n");
-    printf("  $$ |  $$ |  $$ |  \\$$$  /  $$   ____|$$ |  $$ |  $$ |$$\\ $$  __$$ |$$ |      $$ |$$ |  $$ | \n");
-    printf("$$$$$$\\ $$ |  $$ |   \\$  /   \\$$$$$$$\\ $$ |  $$ |  \\$$$$  |\\$$$$$$$ |$$ |      $$ |\\$$$$$$  | \n");
-    printf("\\______|\\__|  \\__|    \\_/     \\_______|\\__|  \\__|   \\____/  \\_______|\\__|      \\__| \\______/  \n");
-
-    printf("\nINGRESA LA INFORMACION.\n\n");
-    while (recepcion == 'S' || recepcion == 's')
-    {
-        if ((archivo_insumo = fopen("Insumos.dat", "r")) == NULL)
-            printf("Error al abrir el archivo de insumos. \n");
-        else
-        {
-            do
-            {
-                printf("1) Numero de proveedor: ");
-                scanf("%d", &num_proveedor);
-
-                if (!validarproveedor(num_proveedor))
-                    printf("Numero de proveedor invalido. Ingresa uno existente.\n");
-
-            } while (!validarproveedor(num_proveedor));
-
-            printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
-            printf("| %-18s | %-18s | %-40s | %-18s |\n", "ID Compra", "Insumo", "Descripcion", "Cantidad");
-            
-            rewind(farchivo);
-            
-            while (fscanf(farchivo, "ID compra: %d\n", &id_compras) == 1)
-            {
-                fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedor);
-                fscanf(farchivo, "Numero de insumo: %d\n", &clave_insumo);
-                fscanf(farchivo, "Cantidad: %d\n", &cantidad);
-                fscanf(farchivo, "Precio: %f\n", &precio);
-                fscanf(farchivo, "Entregado: %c\n", &entregado);
-                
-                // Leer el total directamente desde el archivo
-                fscanf(farchivo, "Total: %f\n", &total);
-
-                // Leer el insumo correspondiente
-                fseek(archivo_insumo, (clave_insumo - 1) * sizeof(struct Insumo), SEEK_SET);
-                fread(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
-
-                // Verificar que se encontró el insumo y mostrar la información
-                if (clave_insumo == insumoLeido.clave_insumo)
-                {
-                    printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
-                    printf("| %-18d | %-18d | %-40s | %-18d |\n", id_compras, clave_insumo, insumoLeido.descripcion, cantidad);
-                    printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
-                    printf("Total: $%.2f\n", total);
-                }
-            }
-
-            do
-            {
-                printf("2) ID de compra: ");
-                scanf("%d", &numero_compra);
-
-                if (!validar_compra(numero_compra))
-                    printf("Numero de compra invalido\n");
-
-            } while (!validar_compra(numero_compra));
-
-            do
-            {
-                printf("Le fue recibida la compra?: ");
-                fflush(stdin);
-                gets(respuesta);
-
-                if (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "Si") != 0)
-                    printf("Respuesta invalida\n");
-
-            } while (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "Si") != 0);
-
-            if (strcmp(respuesta, "si") == 0 || strcmp(respuesta, "Si") == 0) // CUIDADO AQUI
-            {
-                fseek(archivo_insumo, (numero_compra - 1) * sizeof(struct Insumo), SEEK_SET);
-                fread(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
-
-                insumoLeido.inventario += cantidad;
-
-                fseek(archivo_insumo, (numero_compra - 1) * sizeof(struct Insumo), SEEK_SET);
-                fwrite(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
-
-                entregado = 's';
-
-                fprintf(farchivo, "ID compra: %d\n", id_compras);
-                fprintf(farchivo, "Numero de proveedor: %d\n", num_proveedor);
-                fprintf(farchivo, "Numero de insumo: %d\n", clave_insumo);
-                fprintf(farchivo, "Cantidad: %d\n", cantidad);
-                fprintf(farchivo, "Precio: %.2f\n", precio);  // Es mejor mostrar los precios con 2 decimales
-                fprintf(farchivo, "Entregado: %c\n", entregado);
-                fprintf(farchivo, "Total: %.2f\n", total);  // También para el total   
-            }
-
-            do
-            {
-                printf("Agregar otra recepcion? (S/N): ");
-                fflush(stdin);
-                scanf("%c", &recepcion);
-
-                if (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n')
-                    printf("Valor no valido. Solo se permite S o N.\n");
-
-            } while (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n');
-        }
-        fclose(archivo_insumo);
-    }
-}
 
 
 void menu_reportes()
@@ -1867,7 +1746,7 @@ bool validarproveedor(int NumeroProveedor)
         if (proveedor.numero_proveedor == NumeroProveedor)
             proovedorvalido = true;
     }
-    
+
     fclose(proveedorlocal);
     return proovedorvalido;
 }
