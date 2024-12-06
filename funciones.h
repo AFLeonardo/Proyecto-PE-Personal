@@ -24,7 +24,7 @@ bool validarmercado(int);
 bool validararticulo(int);
 int validarcantidad(int, int);
 float precio(int, char *);
-bool validarempleado(int );
+bool validarempleado(int, FILE *);
 float descuento(int );
 bool validarchar(char *);
 bool validarnumerodireccion(char *);
