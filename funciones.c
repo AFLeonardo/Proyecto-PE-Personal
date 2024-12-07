@@ -1190,14 +1190,13 @@ void menu_control_compras(FILE *fcompras)
     }
 }
 
-void menu_control_inventario(FILE *farchivo) 
-{
-    int num_proveedor, numero_compra, id_compras = 0, clave_insumo, cantidad, num_proveedorFile, pos_compra = -1;
+void menu_control_inventario(FILE *farchivo) {
+    int num_proveedor, numero_compra, id_compras = 0, clave_insumo, cantidad, num_proveedorFile;
+    int pos_compra = -1, opcion;
     char recepcion = 's', respuesta[5], entregado;
     struct Insumo insumoLeido;
     FILE *archivo_insumo;
     float precio, total;
-    bool compraValida = true;
 
     printf("$$$$$$\\                                            $$\\                         $$\\           \n");
     printf("\\_$$  _|                                           $$ |                        \\__|          \n");
@@ -1206,37 +1205,53 @@ void menu_control_inventario(FILE *farchivo)
     printf("  $$ |  $$ |  $$ | \\$$\\$$  / $$$$$$$$ |$$ |  $$ |  $$ |     $$$$$$$ |$$ |  \\__|$$ |$$ /  $$ | \n");
     printf("  $$ |  $$ |  $$ |  \\$$$  /  $$   ____|$$ |  $$ |  $$ |$$\\ $$  __$$ |$$ |      $$ |$$ |  $$ | \n");
     printf("$$$$$$\\ $$ |  $$ |   \\$  /   \\$$$$$$$\\ $$ |  $$ |  \\$$$$  |\\$$$$$$$ |$$ |      $$ |\\$$$$$$  | \n");
-    printf("\\______|\\__|  \\__|    \\_/     \\_______|\\__|  \\__|   \\____/  \\_______|\\__|      \\__| \\______/  \n");
+    printf("\\______|\\__|  \\__|    \\_/     \\_______|\\__|  \\__|   \\____/  \\_______|\\__|      \\__| \\______/  \n\n\n");
 
-    printf("\nINGRESA LA INFORMACION.\n\n");
-    while (recepcion == 'S' || recepcion == 's') 
+    opcion = verificar_entregas(farchivo);
+
+    switch (opcion)
     {
-        archivo_insumo = fopen("Insumos.dat", "r+"); // Modo lectura y escritura binaria
-        if (archivo_insumo == NULL) 
-        {
+        case 1:
+            printf("¡Todas las compras han sido entregadas!\n");
+            system("pause");
+            return;
+            break;
+        case 2:
+            printf("No hay compras registradas en el archivo.\n");
+            system("pause");
+            return;
+            break;
+        case 3:
+            printf("Aún hay compras pendientes de entrega!\n");
+            break;
+    }
+    
+    printf("\nINGRESA LA INFORMACION.\n\n");
+
+    while (recepcion == 'S' || recepcion == 's') {
+        archivo_insumo = fopen("Insumos.dat", "r+");
+        if (archivo_insumo == NULL) {
             printf("Error al abrir el archivo de insumos.\n");
-            return; // Salimos si el archivo no pudo abrirse
+            return;
         }
 
-        do 
-        { // VALIDAMOS SI EL PROVEEDOR EXISTE EN EL CATÁLOGO
-            printf("1) Numero de proveedor: ");
+        // Validar número de proveedor
+        do {
+            printf("1) Número de proveedor: ");
             scanf("%d", &num_proveedor);
-            fflush(stdin);
 
             if (!validarproveedor(num_proveedor))
-                printf("Numero de proveedor invalido. Ingresa uno existente.\n");
-
+                printf("Número de proveedor inválido. Ingresa uno existente.\n");
         } while (!validarproveedor(num_proveedor));
 
         printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
         printf("| %-18s | %-18s | %-40s | %-18s |\n", "ID Compra", "Insumo", "Descripcion", "Cantidad");
         printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
 
+        // Rewind y leer el archivo para mostrar compras pendientes
         rewind(farchivo);
         while (fscanf(farchivo, "ID compra: %d\n", &id_compras) == 1) {
-            // Guardar posición antes de leer más información
-            long start_position = ftell(farchivo); 
+            long start_position = ftell(farchivo); // Guardar posición inicial del registro
 
             fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedorFile);
             fscanf(farchivo, "Numero de insumo: %d\n", &clave_insumo);
@@ -1245,27 +1260,27 @@ void menu_control_inventario(FILE *farchivo)
             fscanf(farchivo, "Entregado: %c\n", &entregado);
             fscanf(farchivo, "Total: %f\n", &total);
 
-            if (numero_compra == id_compras) {
-                pos_compra = start_position; // Guardar posición inicial del registro
-                break;
+            if (num_proveedor == num_proveedorFile && entregado == 'n') {
+                fseek(archivo_insumo, (clave_insumo - 1) * sizeof(struct Insumo), SEEK_SET);
+                fread(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
+
+                printf("| %-18d | %-18d | %-40s | %-18d |\n", id_compras, clave_insumo, insumoLeido.descripcion, cantidad);
             }
         }
 
-
         printf("+--------------------+--------------------+------------------------------------------+--------------------+\n");
 
-        do 
-        {
+        // Seleccionar ID de compra
+        do {
             printf("2) ID de compra: ");
             scanf("%d", &numero_compra);
-            fflush(stdin);
 
             rewind(farchivo);
             pos_compra = -1;
 
-            while (fscanf(farchivo, "ID compra: %d\n", &id_compras) == 1) 
-            {
-                long current_position = ftell(farchivo); // Guardamos la posición actual antes de leer más
+            while (fscanf(farchivo, "ID compra: %d\n", &id_compras) == 1) {
+                long start_position = ftell(farchivo); // Guardar posición inicial
+
                 fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedorFile);
                 fscanf(farchivo, "Numero de insumo: %d\n", &clave_insumo);
                 fscanf(farchivo, "Cantidad: %d\n", &cantidad);
@@ -1273,32 +1288,29 @@ void menu_control_inventario(FILE *farchivo)
                 fscanf(farchivo, "Entregado: %c\n", &entregado);
                 fscanf(farchivo, "Total: %f\n", &total);
 
-                if (numero_compra == id_compras) 
-                {
-                    pos_compra = current_position; // Guardamos la posición del registro que coincide
+                if (numero_compra == id_compras) {
+                    pos_compra = start_position - 14;
                     break;
                 }
             }
 
-            if (pos_compra == -1)
-                printf("Numero de compra invalido.\n");
-
+            if (pos_compra == -1) {
+                printf("Número de compra inválido.\n");
+            }
         } while (pos_compra == -1);
 
-        do 
-        {
-            printf("Le fue recibida la compra?: ");
-            fgets(respuesta, sizeof(respuesta), stdin);
-            respuesta[strcspn(respuesta, "\n")] = '\0';
+        // Confirmar recepción
+        do {
+            printf("¿Le fue recibida la compra? (si/no): ");
+            scanf("%s", respuesta);
 
-            if (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "no") != 0)
-                printf("Respuesta invalida. Ingresa 'si' o 'no'.\n");
-
+            if (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "no") != 0) {
+                printf("Respuesta inválida. Ingresa 'si' o 'no'.\n");
+            }
         } while (strcmp(respuesta, "si") != 0 && strcmp(respuesta, "no") != 0);
 
-        if (strcmp(respuesta, "si") == 0) 
-        {
-            // Actualizamos el inventario del insumo
+        if (strcmp(respuesta, "si") == 0) {
+            // Actualizar inventario
             fseek(archivo_insumo, (clave_insumo - 1) * sizeof(struct Insumo), SEEK_SET);
             fread(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
 
@@ -1307,7 +1319,7 @@ void menu_control_inventario(FILE *farchivo)
             fseek(archivo_insumo, (clave_insumo - 1) * sizeof(struct Insumo), SEEK_SET);
             fwrite(&insumoLeido, sizeof(struct Insumo), 1, archivo_insumo);
 
-            // Actualizamos el registro en la posición exacta
+            // Actualizar archivo de compras
             fseek(farchivo, pos_compra, SEEK_SET);
             fprintf(farchivo, "ID compra: %d\n", id_compras);
             fprintf(farchivo, "Numero de proveedor: %d\n", num_proveedorFile);
@@ -1317,20 +1329,18 @@ void menu_control_inventario(FILE *farchivo)
             fprintf(farchivo, "Entregado: %c\n", 's');
             fprintf(farchivo, "Total: %.2f\n", total);
 
-            // Limpiar cualquier dato adicional previo
+            // Truncar cualquier dato adicional
             long current_pos = ftell(farchivo);
-            ftruncate(fileno(farchivo), current_pos);
         }
 
-        do 
-        {
-            printf("Agregar otra recepcion? (S/N): ");
-            scanf("%c", &recepcion);
-            fflush(stdin);
+        // Continuar con otra recepción
+        do {
+            printf("¿Agregar otra recepción? (S/N): ");
+            scanf(" %c", &recepcion);
 
-            if (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n')
-                printf("Valor no valido. Solo se permite S o N.\n");
-
+            if (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n') {
+                printf("Valor no válido. Solo se permite S o N.\n");
+            }
         } while (recepcion != 'S' && recepcion != 's' && recepcion != 'N' && recepcion != 'n');
 
         fclose(archivo_insumo);
@@ -1415,7 +1425,7 @@ void menu_reportes()
                         printf("Ingrese el anio: ");
                         scanf("%d", &anio_reporte);
                         if (anio_reporte < 1990 || anio_reporte > 2024)
-                            printf("Anio de venta invalido, debe de estar entre 1990 y 2024\n");
+                            printf("Año de venta invalido, debe de estar entre 1990 y 2024\n");
                     }while (anio_reporte < 1990 || anio_reporte > 2024);
 
                     do
@@ -1578,6 +1588,39 @@ void menu_reportes()
     }
 
 }
+
+void lista_proveedores_no_entregado(FILE *farchivo, int *lista){
+
+} 
+
+int verificar_entregas(FILE *farchivo) {
+    char entregado;
+    int total_compras = 0;
+    int entregadas = 0,Id;
+
+    rewind(farchivo);
+    while (fscanf(farchivo, "ID compra: %d\n", &Id) == 1) {
+       
+        fscanf(farchivo, "Numero de proveedor: %*d\n");
+        fscanf(farchivo, "Numero de insumo: %*d\n");
+        fscanf(farchivo, "Cantidad: %*d\n");
+        fscanf(farchivo, "Precio: %*f\n");
+        fscanf(farchivo, "Entregado: %c\n", &entregado);
+        fscanf(farchivo, "Total: %*f\n");
+
+        total_compras++;
+        if (entregado == 's') 
+            entregadas++; 
+    }
+
+    if (total_compras == 0)
+        return 2; 
+    else if (total_compras == entregadas)
+        return 1; 
+    else 
+        return 3; 
+}
+
 
 bool validar_rfc(char *frfc)
 {

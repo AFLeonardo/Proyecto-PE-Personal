@@ -37,6 +37,8 @@ float generar_comision(int, float);
 int obtenerUltimoIdCompra(FILE *);
 bool validar_compra(int);
 char *convertir_a_minusculas(char *);
+int verificar_entregas(FILE *);
+void lista_proveedores_no_entregado(FILE *, int *)
 //********************************** */
 
 
