@@ -6,7 +6,7 @@ struct Articulos
     char temp_siembra[50];
     char temp_cosecha[50];
     int clave_mercados[10];
-    int insumos_requeridos[10]; //POR QUE SON MAXIMO 10 INSUMOS POR ARTICULO
+    int insumos_requeridos[10]; 
     float costo_produccion;
     int inventario;
     float precio_venta;
@@ -34,7 +34,7 @@ struct Insumo
     char descripcion[100];
     int punto_reorden;
     int inventario;
-    int clave_proveedor[10]; // Hasta 10 claves de proveedores
+    int clave_proveedor[10]; 
     float precio_compra[10];
 };
 
@@ -47,7 +47,7 @@ struct Proveedor
     float descuento;
     struct Fechas fecha;
     struct Direcciones direccion;
-    int articulos_produce[10]; // Claves de los artículos que produce
+    int articulos_produce[10]; 
 };
 struct Empleado
 {
