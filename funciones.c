@@ -1192,7 +1192,7 @@ void menu_control_compras(FILE *fcompras)
 
 void menu_control_inventario(FILE *farchivo) {
     int num_proveedor, numero_compra, id_compras = 0, clave_insumo, cantidad, num_proveedorFile;
-    int pos_compra = -1, opcion;
+    int pos_compra = -1, opcion, proveedores_faltantes[100], i;
     char recepcion = 's', respuesta[5], entregado;
     struct Insumo insumoLeido;
     FILE *archivo_insumo;
@@ -1222,8 +1222,20 @@ void menu_control_inventario(FILE *farchivo) {
             return;
             break;
         case 3:
-            printf("Aún hay compras pendientes de entrega!\n");
-            break;
+        printf("Aún hay compras pendientes de entrega!\n");
+
+        for (i = 0; i < 100; i++) {
+            proveedores_faltantes[i] = -1;
+        }
+
+        lista_proveedores_no_entregado(farchivo, proveedores_faltantes);
+
+        printf("Proveedores con compras no entregadas:\n");
+        for (i = 0; proveedores_faltantes[i] != -1; i++) {
+            printf("\tProveedor: %d\n", proveedores_faltantes[i]);
+        }
+        break;
+
     }
     
     printf("\nINGRESA LA INFORMACION.\n\n");
@@ -1579,7 +1591,7 @@ void menu_reportes()
             printf("                    $$ |                                                         \n");
             printf("                    \\__|                                                         \n");
             printf("a) Listado de articulos\nb) Total de venta por fecha\nc) Total de venta por articulo\nd) Listado de articulos a solicitar\ne) Saldos por pagar\nf) Calculo de comisiones\ng) Compras pendientes de recepcion\nh) Salir");
-            printf("%20s", "Opcion: ");
+            printf("%20s", "\nOpcion: ");
             fflush(stdin);
             scanf("%c", &opcion);
             if(opcion < 'a' || opcion > 'h')
@@ -1589,9 +1601,43 @@ void menu_reportes()
 
 }
 
-void lista_proveedores_no_entregado(FILE *farchivo, int *lista){
+void lista_proveedores_no_entregado(FILE *farchivo, int *lista) {
+    char entregado;
+    int num_proveedor, i = 0;
+    int Id;
 
-} 
+    rewind(farchivo); 
+
+    while (fscanf(farchivo, "ID compra: %d\n", &Id) == 1) {
+        fscanf(farchivo, "Numero de proveedor: %d\n", &num_proveedor);
+        fscanf(farchivo, "Numero de insumo: %*d\n");
+        fscanf(farchivo, "Cantidad: %*d\n");
+        fscanf(farchivo, "Precio: %*f\n");
+        fscanf(farchivo, "Entregado: %c\n", &entregado);
+        fscanf(farchivo, "Total: %*f\n");
+
+        if (entregado == 'n') {
+            
+            int ya_en_lista = 0;
+            for (int j = 0; j < i; j++) {
+                if (lista[j] == num_proveedor) {
+                    ya_en_lista = 1;
+                    break;
+                }
+            }
+
+            if (!ya_en_lista && i < 100) {
+                lista[i] = num_proveedor;
+                i++;
+            }
+        }
+    }
+
+    if (i < 100) {
+        lista[i] = -1;
+    }
+}
+
 
 int verificar_entregas(FILE *farchivo) {
     char entregado;
