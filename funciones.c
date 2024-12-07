@@ -1359,247 +1359,234 @@ void menu_control_inventario(FILE *farchivo) {
     }
 }
 
-void menu_reportes()
-{
+void menu_reportes() {
     char opcion;
-    FILE *archivo;
+    FILE *archivo, *archivo_compras;
     struct Articulos articulo;
-    int i,anio_venta, dia_venta, mes_venta, clavearticuloreporte, clavearticulo;
-    int dia_reporte, mes_reporte, anio_reporte, num_empleados = 0;
-    bool validardia, hay_comision = false;
+    int i, anio_venta, dia_venta, mes_venta, clavearticuloreporte, clavearticulo;
+    int dia_reporte, mes_reporte, anio_reporte, num_empleados = 0, id_compra, num_proveedor, clave_insumo, cantidad;
+    bool validardia = false, hay_comision = false;
     float total, total_reportes = 0.0, articulostotal = 0.0;
     struct Empleado *empleados;
-    
-    printf("$$$$$$$\\                                            $$\\                         \n");
-    printf("$$  __$$\\                                           $$ |                        \n");
-    printf("$$ |  $$ | $$$$$$\\   $$$$$$\\   $$$$$$\\   $$$$$$\\  $$$$$$\\    $$$$$$\\   $$$$$$$\\ \n");
-    printf("$$$$$$$  |$$  __$$\\ $$  __$$\\ $$  __$$\\ $$  __$$\\ \\_$$  _|  $$  __$$\\ $$  _____| \n");
-    printf("$$  __$$< $$$$$$$$ |$$ /  $$ |$$ /  $$ |$$ |  \\__|  $$ |    $$$$$$$$ |\\$$$$$$\\  \n");
-    printf("$$ |  $$ |$$   ____|$$ |  $$ |$$ |  $$ |$$ |        $$ |$$\\ $$   ____| \\____$$\\ \n");
-    printf("$$ |  $$ |\\$$$$$$$\\ $$$$$$$  |\\$$$$$$  |$$ |        \\$$$$  |\\$$$$$$$\\ $$$$$$$  | \n");
-    printf("\\__|  \\__| \\_______|$$  ____/  \\______/ \\__|         \\____/  \\_______|\\_______/  \n");
-    printf("                    $$ |                                                         \n");
-    printf("                    $$ |                                                         \n");
-    printf("                    \\__|                                                         \n");
-    
-    do
-    {
-        printf("a) Listado de articulos\nb) Total de venta por fecha\nc) Total de venta por articulo\nd) Listado de articulos a solicitar\ne) Saldos por pagar\nf) Calculo de comisiones\ng) Compras pendientes de recepcion\nh) Salir");
+    char entregado;
+
+    do {
+        printf("$$$$$$$\\                                            $$\\                         \n");
+        printf("$$  __$$\\                                           $$ |                        \n");
+        printf("$$ |  $$ | $$$$$$\\   $$$$$$\\   $$$$$$\\   $$$$$$\\  $$$$$$\\    $$$$$$\\   $$$$$$$\\ \n");
+        printf("$$$$$$$  |$$  __$$\\ $$  __$$\\ $$  __$$\\ $$  __$$\\ \\_$$  _|  $$  __$$\\ $$  _____| \n");
+        printf("$$  __$$< $$$$$$$$ |$$ /  $$ |$$ /  $$ |$$ |  \\__|  $$ |    $$$$$$$$ |\\$$$$$$\\  \n");
+        printf("$$ |  $$ |$$   ____|$$ |  $$ |$$ |  $$ |$$ |        $$ |$$\\ $$   ____| \\\\____$$\\ \n");
+        printf("$$ |  $$ |\\$$$$$$$\\ $$$$$$$  |\\$$$$$$  |$$ |        \\\\\$$$  |\\$$$$$$$\\ $$$$$$$  | \n");
+        printf("\\__|  \\__| \\\\_______|$$  ____/  \\______/ \\__|         \\\\\____/  \\\\_______|\\_______/  \n");
+        printf("                    $$ |                                                         \n");
+        printf("                    $$ |                                                         \n");
+        printf("                    \\__|                                                         \n");
+        printf("a) Listado de articulos\nb) Total de venta por fecha\nc) Total de venta por articulo\n");
+        printf("d) Listado de articulos a solicitar\ne) Saldos por pagar\nf) Calculo de comisiones\ng) Compras pendientes de recepcion\nh) Salir\n");
         printf("%20s", "\nOpcion: ");
         fflush(stdin);
-        scanf("%c", &opcion);
-        if(opcion < 'a' || opcion > 'h')
-            printf("Ingrese una opcion valida");
-    }while(opcion < 'a' || opcion > 'h');
+        scanf(" %c", &opcion);
 
-    while(opcion != 'h')
+        if (opcion < 'a' || opcion > 'h') {
+            printf("Ingrese una opcion valida\n");
+        }
+
+    } while (opcion < 'a' || opcion > 'h');
+
+    while (opcion != 'h') 
     {
-        switch(opcion)
+        switch (opcion) 
         {
             case 'a':
-                if((archivo = fopen("Articulos.dat", "r")) == NULL)
+            {
+                if ((archivo = fopen("Articulos.dat", "r")) == NULL) 
                     printf("ERROR.\nNo se pudo abrir el archivo.\n");
-                else
-                {
+                else {
+                    printf("\n\n---------------------------------------------------------------------------------------------------------------\n");
                     printf("%-20s %-20s %-10s %-10s %-10s %-15s %-20s\n",
                         "Clave del Articulo", "Descripcion", "Siembra", "Cosecha",
                         "Inventario", "Precio de venta", "Clave del Insumo");
                     printf("---------------------------------------------------------------------------------------------------------------\n");
 
-                    while (fread(&articulo, sizeof(struct Articulos), 1, archivo) == 1)
+                    while (fread(&articulo, sizeof(struct Articulos), 1, archivo) == 1) 
                     {
-                        printf("%-20d %-20s %-10s %-10s %-10d %-15.2f [",
+                        if (articulo.clave_articulo == 0)
+                            break;
+                        else {
+                            printf("%-20d %-20s %-10s %-10s %-10d %-15.2f [",
                             articulo.clave_articulo, articulo.descripcion, articulo.temp_siembra,
                             articulo.temp_cosecha, articulo.inventario, articulo.precio_venta);
 
-
-                        for (int i = 0; i < 10; i++)
-                        {
-                            printf("%d", articulo.insumos_requeridos[i]);
-                            if (i < 9) printf(", ");
+                            int primero = 1; 
+                            for (i = 0; i < 10; i++) 
+                            {
+                                if (articulo.insumos_requeridos[i] != 0) 
+                                {
+                                    if (!primero) 
+                                        printf(", ");
+                                    printf("%d", articulo.insumos_requeridos[i]);
+                                    primero = 0;
+                                }
+                            }
+                            printf("]\n");
                         }
-                        printf("]\n");
                     }
-
-                    fclose(archivo);
                 }
-                break;
+                fclose(archivo);
+            }
+            break;
 
             case 'b':
-                if((archivo = fopen("Ventas.txt", "r")) == NULL)
+                if ((archivo = fopen("Ventas.txt", "r")) == NULL) {
                     printf("ERROR.\nNo se pudo abrir el archivo.\n");
-                else
-                {
-
-
-                    do
-                    {
+                } else {
+                    // Solicitar fecha de reporte
+                    do {
                         printf("Ingrese el anio: ");
                         scanf("%d", &anio_reporte);
-                        if (anio_reporte < 1990 || anio_reporte > 2024)
+                        if (anio_reporte < 1990 || anio_reporte > 2024) {
                             printf("Año de venta invalido, debe de estar entre 1990 y 2024\n");
-                    }while (anio_reporte < 1990 || anio_reporte > 2024);
+                        }
+                    } while (anio_reporte < 1990 || anio_reporte > 2024);
 
-                    do
-                    {
+                    do {
                         printf("Ingrese el mes: ");
                         scanf("%d", &mes_reporte);
-                        if (mes_reporte < 1 || mes_reporte > 12)
+                        if (mes_reporte < 1 || mes_reporte > 12) {
                             printf("Mes de nacimiento invalido, debe de estar entre 1 y 12\n");
+                        }
+                    } while (mes_reporte < 1 || mes_reporte > 12);
 
-                    }while (mes_reporte < 1 || mes_reporte > 12);
-
-                    do
-                    {
+                    do {
                         printf("Ingrese el dia: ");
                         scanf("%d", &dia_reporte);
                         validardia = validarDiaMes(dia_reporte, mes_reporte, anio_reporte);
-                        if (!validardia)
+                        if (!validardia) {
                             printf("Ingrese un dia valido correspondiente al mes\n");
+                        }
+                    } while (!validardia);
 
-                    }while (!validardia);
-
+                    // Procesar archivo de ventas
                     fscanf(archivo, "Clave mercado: %*d\nClave articulo: %*d\nCantidad: %*d\nPrecio: %*f\nNum. empleado: %*d\nComision: %*f\nFecha de venta: %02d/%02d/%04d\nTotal: %f\n", &dia_venta, &mes_venta, &anio_venta, &total);
-                    while(!feof(archivo))
-                    {
-                        if(dia_reporte == dia_venta && mes_reporte == mes_venta && anio_reporte == anio_venta)
+                    while (!feof(archivo)) {
+                        if (dia_reporte == dia_venta && mes_reporte == mes_venta && anio_reporte == anio_venta) {
                             total_reportes += total;
+                        }
                         fscanf(archivo, "Clave mercado: %*d\nClave articulo: %*d\nCantidad: %*d\nPrecio: %*f\nNum. empleado: %*d\nComision: %*f\nFecha de venta: %02d/%02d/%04d\nTotal: %f\n", &dia_venta, &mes_venta, &anio_venta, &total);
                     }
 
-                    if (total_reportes > 0)
+                    if (total_reportes > 0) {
                         printf("El total de ventas para el %02d/%02d/%04d es: %.2f\n", dia_reporte, mes_reporte, anio_reporte, total_reportes);
-                    else
+                    } else {
                         printf("No hay ventas registradas para la fecha %02d/%02d/%04d", dia_reporte, mes_reporte, anio_reporte);
-
-
+                    }
                     fclose(archivo);
                 }
                 break;
 
             case 'c':
-                if((archivo = fopen("Ventas.txt", "r")) == NULL)
+                if ((archivo = fopen("Ventas.txt", "r")) == NULL) {
                     printf("ERROR.\nNo se pudo abrir el archivo.\n");
-                else
-                {
-
+                } else {
                     printf("Ingrese la clave del articulo: ");
                     scanf("%d", &clavearticuloreporte);
 
                     fscanf(archivo, "Clave mercado: %*d\nClave articulo: %d\nCantidad: %*d\nPrecio: %*f\nNum. empleado: %*d\nComision: %*f\nFecha de venta: %*02d/%*02d/%*04d\nTotal: %f\n", &clavearticulo, &total);
-                    while(!feof(archivo))
-                    {
-                        if(clavearticuloreporte == clavearticulo)
+                    while (!feof(archivo)) {
+                        if (clavearticuloreporte == clavearticulo) {
                             articulostotal += total;
-                        fscanf(archivo, "Clave mercado: %*d\nClave articulo: %d\nCantidad: %*d\nPrecio: %*f\nNum. empleado: %*d\nComision: %*f\nFecha de venta: %*02d/%*02d/%*04d\nTotal: %*f\n", &clavearticulo);
+                        }
+                        fscanf(archivo, "Clave mercado: %*d\nClave articulo: %d\nCantidad: %*d\nPrecio: %*f\nNum. empleado: %*d\nComision: %*f\nFecha de venta: %*02d/%*02d/%*04d\nTotal: %f\n", &clavearticulo, &total);
                     }
 
-                    if (articulostotal > 0)
-                        printf("El total de ventas para el articulo %d es: %.2f\n", clavearticuloreporte, total_reportes);
-                    else
-                        printf("No hay ventas registradas para el articulo %d", clavearticuloreporte);
-
+                    if (articulostotal > 0) {
+                        printf("El total de ventas para el articulo %d es: %.2f\n", clavearticuloreporte, articulostotal);
+                    } else {
+                        printf("No hay ventas registradas para el articulo %d\n", clavearticuloreporte);
+                    }
                     fclose(archivo);
                 }
                 break;
 
             case 'd':
-                if((archivo = fopen("Insumos.dat", "r")) == NULL)
-                    printf("ERROR.\nNo se pudo abrir el archivo.\n");
-                else
-                {
-
-
-                }
+                printf("Funcionalidad no implementada.\n");
                 break;
+
             case 'e':
+                printf("Funcionalidad no implementada.\n");
                 break;
+
             case 'f':
-                {
-                    if ((archivo = fopen("Empleados.dat", "r")) == NULL)
-                        printf("Error al abrir el archivo de empleados.\n");
-                    else
-                    {
-                        fseek(archivo, 0, SEEK_END);
-                        num_empleados = ftell(archivo) / sizeof(struct Empleado);
-                        rewind(archivo);
-
-                        empleados = (struct Empleado*) malloc(num_empleados * sizeof(struct Empleado));
-                        if (empleados == NULL)
-                        {
-                            printf("Error al asignar memoria.\n");
-                            fclose(archivo);
-                            return 1;
-                        }
-
-                        fread(empleados, sizeof(struct Empleado), num_empleados, archivo);
-                        fclose(archivo);
-
-                        printf("-------------------------------------------------------------------------------------------------------------\n");
-                        printf("Num Empl | Nombre Completo              | RFC         | Comision | Fecha Contratacion | Direccion\n");
-                        printf("-------------------------------------------------------------------------------------------------------------\n");
-
-
-                        for (int i = 0; i < num_empleados; i++)
-                        {
-                            if (empleados[i].comision > 0)
-                            {
-                                hay_comision = true;
-                                printf("%-9d | %-30s | %-10s | %-8.2f | %02d/%02d/%04d | %s, %s, %s, %s\n",
-                                    empleados[i].numero_empleado,
-                                    empleados[i].nombre_completo,
-                                    empleados[i].RFC,
-                                    empleados[i].comision,
-                                    empleados[i].fecha.dia,
-                                    empleados[i].fecha.mes,
-                                    empleados[i].fecha.anio,
-                                    empleados[i].direccion.calle,
-                                    empleados[i].direccion.numero,
-                                    empleados[i].direccion.colonia,
-                                    empleados[i].direccion.estado);
-                            }
-                        }
-                        if (!hay_comision)
-                            printf("No se encontraron empleados con comisión.\n");
-
-                        printf("-------------------------------------------------------------------------------------------------------------\n");
-                        free(empleados);
-                    }
+                if ((archivo = fopen("Empleados.dat", "r")) == NULL) {
+                    printf("Error al abrir el archivo de empleados.\n");
+                } else {
+                    fseek(archivo, 0, SEEK_END);
+                    num_empleados = ftell(archivo) / sizeof(struct Empleado);
+                    rewind(archivo);
                 }
                 break;
+            
             case 'g':
-                if((archivo = fopen("Compras.dat", "r")) == NULL)
-                    printf("ERROR.\nNo se pudo abrir el archivo.\n");
-                else
+                if ((archivo_compras = fopen("Compras.txt", "r")) == NULL)
+                    printf("ERROR.\nNo se pudo abrir el archivo de compras.\n");
+                else 
                 {
+                    printf("\n--- REPORTE DE COMPRAS PENDIENTES DE RECIBIR ---\n");
+                    printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
+                    printf("| %-10s | %-18s | %-18s | %-18s | %-8s | %-7s |\n",
+                        "ID Compra", "Numero Proveedor", "Clave Insumo", "Cantidad", "Precio", "Total");
+                    printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
 
+                    while (fscanf(archivo_compras, "ID compra: %d\n", &id_compra) == 1) 
+                    {
+                        fscanf(archivo_compras, "Numero de proveedor: %d\n", &num_proveedor);
+                        fscanf(archivo_compras, "Numero de insumo: %d\n", &clave_insumo);
+                        fscanf(archivo_compras, "Cantidad: %d\n", &cantidad);
+                        fscanf(archivo_compras, "Precio: %f\n", &precio);
+                        fscanf(archivo_compras, "Entregado: %c\n", &entregado);
+                        fscanf(archivo_compras, "Total: %f\n", &total);
+
+                        if (entregado == 'n') 
+                        {
+                            printf("| %-10d | %-18d | %-18d | %-18d | %-8.2f | %-7.2f |\n",
+                                id_compra, num_proveedor, clave_insumo, cantidad, precio, total);
+                        }
+                    }
+                    printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
+                    fclose(archivo_compras);
                 }
                 break;
+
         }
 
-        do
-        {
+        do {
             printf("$$$$$$$\\                                            $$\\                         \n");
             printf("$$  __$$\\                                           $$ |                        \n");
             printf("$$ |  $$ | $$$$$$\\   $$$$$$\\   $$$$$$\\   $$$$$$\\  $$$$$$\\    $$$$$$\\   $$$$$$$\\ \n");
             printf("$$$$$$$  |$$  __$$\\ $$  __$$\\ $$  __$$\\ $$  __$$\\ \\_$$  _|  $$  __$$\\ $$  _____| \n");
             printf("$$  __$$< $$$$$$$$ |$$ /  $$ |$$ /  $$ |$$ |  \\__|  $$ |    $$$$$$$$ |\\$$$$$$\\  \n");
-            printf("$$ |  $$ |$$   ____|$$ |  $$ |$$ |  $$ |$$ |        $$ |$$\\ $$   ____| \\____$$\\ \n");
-            printf("$$ |  $$ |\\$$$$$$$\\ $$$$$$$  |\\$$$$$$  |$$ |        \\$$$$  |\\$$$$$$$\\ $$$$$$$  | \n");
-            printf("\\__|  \\__| \\_______|$$  ____/  \\______/ \\__|         \\____/  \\_______|\\_______/  \n");
+            printf("$$ |  $$ |$$   ____|$$ |  $$ |$$ |  $$ |$$ |        $$ |$$\\ $$   ____| \\\\____$$\\ \n");
+            printf("$$ |  $$ |\\$$$$$$$\\ $$$$$$$  |\\$$$$$$  |$$ |        \\\\\$$$  |\\$$$$$$$\\ $$$$$$$  | \n");
+            printf("\\__|  \\__| \\\\_______|$$  ____/  \\______/ \\__|         \\\\\____/  \\\\_______|\\_______/  \n");
             printf("                    $$ |                                                         \n");
             printf("                    $$ |                                                         \n");
             printf("                    \\__|                                                         \n");
-            printf("a) Listado de articulos\nb) Total de venta por fecha\nc) Total de venta por articulo\nd) Listado de articulos a solicitar\ne) Saldos por pagar\nf) Calculo de comisiones\ng) Compras pendientes de recepcion\nh) Salir");
+            printf("a) Listado de articulos\nb) Total de venta por fecha\nc) Total de venta por articulo\n");
+            printf("d) Listado de articulos a solicitar\ne) Saldos por pagar\nf) Calculo de comisiones\ng) Compras pendientes de recepcion\nh) Salir\n");
             printf("%20s", "\nOpcion: ");
             fflush(stdin);
-            scanf("%c", &opcion);
-            if(opcion < 'a' || opcion > 'h')
-                printf("Ingrese una opcion valida");
-        }while(opcion < 'a' || opcion > 'h');
+            scanf(" %c", &opcion);
+
+            if (opcion < 'a' || opcion > 'h') {
+                printf("Ingrese una opcion valida\n");
+            }
+
+        } while (opcion < 'a' || opcion > 'h');
     }
 
 }
+
 
 void lista_proveedores_no_entregado(FILE *farchivo, int *lista) {
     char entregado;
@@ -1638,7 +1625,6 @@ void lista_proveedores_no_entregado(FILE *farchivo, int *lista) {
     }
 }
 
-
 int verificar_entregas(FILE *farchivo) {
     char entregado;
     int total_compras = 0;
@@ -1666,7 +1652,6 @@ int verificar_entregas(FILE *farchivo) {
     else 
         return 3; 
 }
-
 
 bool validar_rfc(char *frfc)
 {
