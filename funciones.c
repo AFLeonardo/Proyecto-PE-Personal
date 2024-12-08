@@ -1366,7 +1366,7 @@ void menu_reportes() {
     int i, anio_venta, dia_venta, mes_venta, clavearticuloreporte, clavearticulo;
     int dia_reporte, mes_reporte, anio_reporte, num_empleados = 0, id_compra, num_proveedor, clave_insumo, cantidad;
     bool validardia = false, hay_comision = false;
-    float total, total_reportes = 0.0, articulostotal = 0.0;
+    float total, total_reportes = 0.0, articulostotal = 0.0, preciocompra;
     struct Empleado *empleados;
     char entregado;
 
@@ -1533,7 +1533,47 @@ void menu_reportes() {
                 break;
 
             case 'e':
-                printf("Funcionalidad no implementada.\n");
+                {
+                    if ((archivo_compras = fopen("Compras.txt", "r")) == NULL) {
+                        printf("ERROR.\nNo se pudo abrir el archivo de compras.\n");
+                    } else {
+                        printf("\n--- REPORTE DE SALDOS POR PAGAR ---\n");
+                        printf("+--------------------+--------------------+\n");
+                        printf("| Numero Proveedor   | Saldo por Pagar    |\n");
+                        printf("+--------------------+--------------------+\n");
+
+                        int proveedor_actual;
+                        float saldo_pendiente = 0;
+                        int hay_saldo = 0;
+
+                        while (fscanf(archivo_compras, "ID compra: %d\n", &id_compra) == 1) {
+                            fscanf(archivo_compras, "Numero de proveedor: %d\n", &num_proveedor);
+                            fscanf(archivo_compras, "Numero de insumo: %d\n", &clave_insumo);
+                            fscanf(archivo_compras, "Cantidad: %d\n", &cantidad);
+                            fscanf(archivo_compras, "Precio: %f\n", &preciocompra);
+                            fscanf(archivo_compras, "Entregado: %c\n", &entregado);
+                            fscanf(archivo_compras, "Total: %f\n", &total);
+
+                            
+                            if (entregado == 'n') {
+                                saldo_pendiente += total;
+                                proveedor_actual = num_proveedor;
+                                hay_saldo = 1;
+                            }
+                        }
+
+                        fclose(archivo_compras);
+
+                        if (hay_saldo) {
+                            printf("| %-18d | %-18.2f |\n", proveedor_actual, saldo_pendiente);
+                            printf("+--------------------+--------------------+\n");
+                            system("pause");
+                        } else {
+                            printf("No se encontraron saldos por pagar.\n");
+                        }
+                    }
+
+                }
                 break;
 
             case 'f':
@@ -1567,7 +1607,7 @@ void menu_reportes() {
                             if (empleados[i].comision > 0)
                             {
                                 hay_comision = true;
-                                printf("| %-9d | %-40s | %-15s | %-8.2f | %02d/%02d/%04d     | %-40s, %s, %s, %s |\n",
+                                printf("| %-9d | %-40s | %-15s | %-8.2f | %02d/%02d/%04d     | %s, %s, %s, %s |\n",
                                     empleados[i].numero_empleado,
                                     empleados[i].nombre_completo,
                                     empleados[i].RFC,
@@ -1593,37 +1633,35 @@ void menu_reportes() {
                 break;
             
             case 'g':
-                {
-                    if ((archivo_compras = fopen("Compras.txt", "r")) == NULL)
-                        printf("ERROR.\nNo se pudo abrir el archivo de compras.\n");
-                    else 
-                    {
-                        printf("\n--- REPORTE DE COMPRAS PENDIENTES DE RECIBIR ---\n");
-                        printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
-                        printf("| %-10s | %-18s | %-18s | %-18s | %-8s | %-7s |\n",
-                            "ID Compra", "Numero Proveedor", "Clave Insumo", "Cantidad", "Precio", "Total");
-                        printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
+            {
+                if ((archivo_compras = fopen("Compras.txt", "r")) == NULL)
+                    printf("ERROR.\nNo se pudo abrir el archivo de compras.\n");
+                else {
+                    printf("\n--- REPORTE DE COMPRAS PENDIENTES DE RECIBIR ---\n");
+                    printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
+                    printf("| %-10s | %-18s | %-18s | %-18s | %-8s | %-7s |\n",
+                        "ID Compra", "Numero Proveedor", "Clave Insumo", "Cantidad", "Precio", "Total");
+                    printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
 
-                        while (fscanf(archivo_compras, "ID compra: %d\n", &id_compra) == 1) 
-                        {
-                            fscanf(archivo_compras, "Numero de proveedor: %d\n", &num_proveedor);
-                            fscanf(archivo_compras, "Numero de insumo: %d\n", &clave_insumo);
-                            fscanf(archivo_compras, "Cantidad: %d\n", &cantidad);
-                            fscanf(archivo_compras, "Precio: %f\n", &precio);
-                            fscanf(archivo_compras, "Entregado: %c\n", &entregado);
-                            fscanf(archivo_compras, "Total: %f\n", &total);
+                    while (fscanf(archivo_compras, "ID compra: %d\n", &id_compra) == 1) {
+                        fscanf(archivo_compras, "Numero de proveedor: %d\n", &num_proveedor);
+                        fscanf(archivo_compras, "Numero de insumo: %d\n", &clave_insumo);
+                        fscanf(archivo_compras, "Cantidad: %d\n", &cantidad) ;
+                        fscanf(archivo_compras, "Precio: %f\n", &preciocompra) ;
+                        fscanf(archivo_compras, "Entregado: %c\n", &entregado) ;
+                        fscanf(archivo_compras, "Total: %f\n", &total) ;
 
-                            if (entregado == 'n') 
-                            {
-                                printf("| %-10d | %-18d | %-18d | %-18d | %-8.2f | %-7.2f |\n",
-                                    id_compra, num_proveedor, clave_insumo, cantidad, precio, total);
-                            }
+                        if (entregado == 'n') {
+                            printf("| %-10d | %-18d | %-18d | %-18d | %-8.2f | %-7.2f |\n",
+                                id_compra, num_proveedor, clave_insumo, cantidad, preciocompra, total);
                         }
-                        printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
-                        fclose(archivo_compras);
                     }
+                    printf("+------------+--------------------+--------------------+--------------------+----------+---------+\n");
                 }
-                break;
+                fclose(archivo_compras);
+                system("pause");
+            }
+            break;
 
         }
 
