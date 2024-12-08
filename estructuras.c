@@ -1,4 +1,3 @@
-// ESTRUCTURAS
 struct Articulos
 {
     int clave_articulo;
